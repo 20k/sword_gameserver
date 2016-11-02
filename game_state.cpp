@@ -432,16 +432,19 @@ void game_state::process_received_message(byte_fetch& arg, sockaddr_storage& who
     ///payload
     ///canary
 
+    ///Ok, we can optimise this. int16_t playerid
+    ///int8_t componentid
+    ///canaries, get rid of too
     byte_vector vec;
     vec.push_back(canary_start);
     vec.push_back(message::FORWARDING);
-    vec.push_back<int32_t>(fetch.get<int32_t>()); ///playerid
-    vec.push_back<int32_t>(fetch.get<int32_t>()); ///componentid
+    vec.push_back<net_type::player_t>(fetch.get<net_type::player_t>()); ///playerid
+    vec.push_back<net_type::component_t>(fetch.get<net_type::component_t>()); ///componentid
 
     ///length of payload
-    int32_t len = fetch.get<int32_t>();
+    net_type::len_t len = fetch.get<net_type::len_t>();
 
-    vec.push_back<int32_t>(len);
+    vec.push_back<net_type::len_t>(len);
 
     for(int i=0; i<len; i++)
     {
