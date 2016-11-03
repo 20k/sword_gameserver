@@ -83,7 +83,7 @@ void game_state::add_player(udp_sock& sock, sockaddr_storage store)
 {
     int id = gid++;
 
-    gid %= (int)pow(2, 16) - 2;
+    gid %= (int)pow(2, 15) - 2;
 
     printf("Gained a player with id %i\n", id);
 
