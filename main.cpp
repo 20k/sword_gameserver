@@ -281,5 +281,7 @@ int main(int argc, char* argv[])
         }
 
         my_state.broadcast_ping_data();
+
+        my_state.packet_clump.tick();
     }
 }

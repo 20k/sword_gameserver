@@ -1,13 +1,16 @@
 #ifndef GAME_STATE_HPP_INCLUDED
 #define GAME_STATE_HPP_INCLUDED
 
+#include <vec/vec.hpp>
 #include <net/shared.hpp>
-#include "game_modes.hpp"
+
 #include <set>
 #include <map>
-#include "../reliability_shared.hpp"
 
-#include <vec/vec.hpp>
+#include "game_modes.hpp"
+
+#include "../reliability_shared.hpp"
+#include "../packet_clumping_shared.hpp"
 
 struct player
 {
@@ -95,6 +98,8 @@ struct server_reliability_manager
 ///uuh. this is really a networking class?
 struct game_state
 {
+    packet_clumper packet_clump;
+
     server_reliability_manager reliable;
 
     int max_players = 10;
@@ -112,7 +117,7 @@ struct game_state
     ///maps player id who died to kill count structure
     std::map<int32_t, kill_count_timer> kill_confirmer;
 
-    int gid = 0;
+    int16_t gid = 0;
 
     float timeout_time_ms = 10000;
     float ping_interval_ms = 1000;
@@ -132,6 +137,7 @@ struct game_state
 
     void broadcast(const std::vector<char>& dat, const int& to_skip);
     void broadcast(const std::vector<char>& dat, sockaddr_storage& to_skip);
+    void broadcast_clump(const std::vector<char>& dat, sockaddr_storage& to_skip);
 
     void cull_disconnected_players();
     void add_player(udp_sock& sock, sockaddr_storage store);

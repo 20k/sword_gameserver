@@ -1,5 +1,6 @@
 #include "game_state.hpp"
 #include "../master_server/network_messages.hpp"
+#include "../packet_clumping_shared.hpp"
 
 void server_reliability_manager::tick(game_state* state)
 {
@@ -81,6 +82,8 @@ void server_reliability_manager::add_packetid_to_ack(uint32_t reliable_id, int32
 void game_state::add_player(udp_sock& sock, sockaddr_storage store)
 {
     int id = gid++;
+
+    gid %= (int)pow(2, 16) - 2;
 
     printf("Gained a player with id %i\n", id);
 
@@ -240,6 +243,28 @@ void game_state::broadcast(const std::vector<char>& dat, sockaddr_storage& to_sk
 
     if(c > 1)
         printf("ip conflict ");
+}
+
+void game_state::broadcast_clump(const std::vector<char>& dat, sockaddr_storage& to_skip)
+{
+    int c = 0;
+
+    for(int i=0; i<player_list.size(); i++)
+    {
+        udp_sock& fd = player_list[i].sock;
+        sockaddr_storage store = player_list[i].store;
+
+        if(store == to_skip)
+        {
+            c++;
+            continue;
+        }
+
+        packet_clump.add_send_data(fd, store, dat);
+    }
+
+    if(c > 1)
+        printf("ip conflict bclp");
 }
 
 #if 0
@@ -464,7 +489,7 @@ void game_state::process_received_message(byte_fetch& arg, sockaddr_storage& who
 
     arg = fetch;
 
-    broadcast(vec.ptr, who);
+    broadcast_clump(vec.ptr, who);
 }
 
 void game_state::process_reported_message(byte_fetch& arg, sockaddr_storage& who)
