@@ -187,7 +187,7 @@ namespace map_namespace
     };
 }
 
-
+///do not grid based
 namespace game_map
 {
     //static float scale = 1000.f;

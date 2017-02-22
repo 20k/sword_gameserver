@@ -57,6 +57,7 @@
 		</Linker>
 		<Unit filename="../../openclrenderer/logging.cpp" />
 		<Unit filename="../master_server/network_messages.hpp" />
+		<Unit filename="../packet_clumping_shared.hpp" />
 		<Unit filename="../reliability_shared.cpp" />
 		<Unit filename="../reliability_shared.hpp" />
 		<Unit filename="game_modes.cpp" />

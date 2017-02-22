@@ -36,8 +36,6 @@ struct player
     sf::Clock time_since_last_message;
 };
 
-bool operator==(sockaddr_storage& s1, sockaddr_storage& s2);
-
 ///modify this to have player_id_reported_as_killer
 struct kill_count_timer
 {
