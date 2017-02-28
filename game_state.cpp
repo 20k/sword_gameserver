@@ -644,6 +644,22 @@ void game_state::process_ping_response(udp_sock& my_server, byte_fetch& fetch, s
     //printf("last time %f\n", last_time_ms);
 }
 
+void game_state::process_ping_gameserver(udp_sock& sock, byte_fetch& fetch, sockaddr_storage& who)
+{
+    int32_t found_end = fetch.get<int32_t>();
+
+    if(found_end != canary_end)
+        return;
+
+    byte_vector vec;
+
+    vec.push_back(canary_start);
+    vec.push_back(message::PING_GAMESERVER_RESPONSE);
+    vec.push_back(canary_end);
+
+    udp_send_to(sock, vec.ptr, (sockaddr*)&who);
+}
+
 ///ok, the server can store everyone's pings and then distribute to clients
 ///really we should be sending out timestamps with all the updates, and then use that :[
 

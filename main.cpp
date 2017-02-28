@@ -232,6 +232,10 @@ int main(int argc, char* argv[])
                 {
                     my_state.process_ping_response(my_server, fetch, store);
                 }
+                else if(type == message::PING_GAMESERVER)
+                {
+                    my_state.process_ping_gameserver(my_server, fetch, store);
+                }
                 else
                 {
                     printf("err %i ", type);
