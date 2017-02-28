@@ -253,8 +253,6 @@ int main(int argc, char* argv[])
                 ///client pushing data to other clients
         }
 
-        ///heap corruption??
-        ///this was fixed a long time ago
         sf::sleep(sf::milliseconds(1));
 
         //my_state.tick_all();
