@@ -45,7 +45,7 @@ struct kill_count_timer
     const float max_time = 1000.f; ///1s window
 };
 
-struct game_state;
+struct server_game_state;
 
 struct game_mode_handler
 {
@@ -58,7 +58,7 @@ struct game_mode_handler
     bool in_game_over_state = false;
     sf::Clock game_over_timer;
 
-    void tick(game_state* state);
+    void tick(server_game_state* state);
 
     bool game_over();
 };
@@ -72,13 +72,13 @@ struct respawn_request
     bool respawned = false;
 };
 
-struct game_state;
+struct server_game_state;
 
 struct server_reliability_manager
 {
     std::map<int32_t, reliability_manager> player_reliability_handler;
 
-    void tick(game_state* state);
+    void tick(server_game_state* state);
 
     void add(byte_vector& vec, int32_t to_skip, uint32_t reliable_id);
     void add_packetid_to_ack(uint32_t id, int32_t to_whom);
@@ -94,7 +94,7 @@ struct server_reliability_manager
 ///so the client will send something like
 ///update component playerid componentenum value
 ///uuh. this is really a networking class?
-struct game_state
+struct server_game_state
 {
     packet_clumper packet_clump;
 

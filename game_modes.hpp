@@ -69,28 +69,6 @@ namespace map_namespace
         //G
     };
 
-    enum map_cube_t
-    {
-        BOTTOM = 0,
-        TOP = 1,
-        FRONT = 2,
-        LEFT = 3,
-        RIGHT = 4,
-        BEHIND = 5,
-    };
-
-    ///x = either axis here
-
-    ///eg if my axis goes 0 -> x, and x = 0 @ x = x and x -> x on the second plane like the first
-    ///we'd be a no
-    enum axis_are_flipped
-    {
-        NO,
-        YES, ///x -> y
-        NEG, ///x -> -x
-        YES_NEG, ///x -> -y
-    };
-
     static std::vector<vec3f> map_cube_rotations =
     {
         {0,0,0},
@@ -99,32 +77,6 @@ namespace map_namespace
         {0,0,M_PI/2},
         {0,0,-M_PI/2},
         {-M_PI/2,0,0},
-    };
-
-    ///from 0 -> map_cube_t
-    ///+y, -y, +x, -x
-    static std::vector<std::vector<map_cube_t>> connection_map
-    {
-        ///so, bottom +y connects to front, -y connects to behind etc
-        {FRONT, BEHIND, RIGHT, LEFT}, ///BOTTOM
-        {BEHIND, FRONT, RIGHT, LEFT}, ///TOP
-        {TOP, BOTTOM, RIGHT, LEFT}, ///FRONT
-        {FRONT, BEHIND, BOTTOM, TOP}, ///LEFT
-        {FRONT, BEHIND, TOP, BOTTOM}, ///RIGHT
-        {BOTTOM, TOP, RIGHT, LEFT}, ///BEHIND
-    };
-
-    ///to be fair, i could  have just defined the vecs in 2d space and probably worked it out from there
-    ///as a net, or something
-    ///this requires less figuring though, although its not very elegant
-    static std::vector<std::vector<axis_are_flipped>> axis_map
-    {
-        {NO, NO, NO, NO},
-        {NO, NO, NEG, NEG},
-        {NO, NO, YES_NEG, YES},
-        {YES, YES_NEG, NO, NEG},
-        {YES_NEG, YES, NEG, NO},
-        {NO, NO, YES, YES_NEG},
     };
 
     ///rotations are defined from the reference plane of the bottom

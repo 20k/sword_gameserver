@@ -2,7 +2,7 @@
 #include "../master_server/network_messages.hpp"
 #include "../packet_clumping_shared.hpp"
 
-void server_reliability_manager::tick(game_state* state)
+void server_reliability_manager::tick(server_game_state* state)
 {
     const float broadcast_time_ms = 4;
 
@@ -79,7 +79,7 @@ void server_reliability_manager::add_packetid_to_ack(uint32_t reliable_id, int32
     }
 }
 
-void game_state::add_player(udp_sock& sock, sockaddr_storage store)
+void server_game_state::add_player(udp_sock& sock, sockaddr_storage store)
 {
     int id = gid++;
 
@@ -98,7 +98,7 @@ void game_state::add_player(udp_sock& sock, sockaddr_storage store)
     reliable.add_player(id);
 }
 
-int game_state::number_of_team(int team_id)
+int server_game_state::number_of_team(int team_id)
 {
     int c = 0;
 
@@ -111,7 +111,7 @@ int game_state::number_of_team(int team_id)
     return c;
 }
 
-int32_t game_state::get_team_from_player_id(int32_t id)
+int32_t server_game_state::get_team_from_player_id(int32_t id)
 {
     for(auto& i : player_list)
     {
@@ -122,7 +122,7 @@ int32_t game_state::get_team_from_player_id(int32_t id)
     return -1;
 }
 
-player game_state::get_player_from_player_id(int32_t id)
+player server_game_state::get_player_from_player_id(int32_t id)
 {
     for(auto& i : player_list)
     {
@@ -133,7 +133,7 @@ player game_state::get_player_from_player_id(int32_t id)
     return player();
 }
 
-int32_t game_state::get_pos_from_player_id(int32_t id)
+int32_t server_game_state::get_pos_from_player_id(int32_t id)
 {
     //for(auto& i : player_list)
     for(int i=0; i<player_list.size(); i++)
@@ -146,7 +146,7 @@ int32_t game_state::get_pos_from_player_id(int32_t id)
 }
 
 ///need to heartbeat
-void game_state::cull_disconnected_players()
+void server_game_state::cull_disconnected_players()
 {
     for(int i=0; i<player_list.size(); i++)
     {
@@ -174,7 +174,7 @@ void game_state::cull_disconnected_players()
     return false;
 }*/
 
-void game_state::reset_player_disconnect_timer(sockaddr_storage& store)
+void server_game_state::reset_player_disconnect_timer(sockaddr_storage& store)
 {
     for(auto& i : player_list)
     {
@@ -185,7 +185,7 @@ void game_state::reset_player_disconnect_timer(sockaddr_storage& store)
     }
 }
 
-void game_state::set_map(int id)
+void server_game_state::set_map(int id)
 {
     map_num = id;
 
@@ -209,7 +209,7 @@ void game_state::set_map(int id)
     }
 }
 
-void game_state::broadcast(const std::vector<char>& dat, const int& to_skip)
+void server_game_state::broadcast(const std::vector<char>& dat, const int& to_skip)
 {
     for(int i=0; i<player_list.size(); i++)
     {
@@ -223,7 +223,7 @@ void game_state::broadcast(const std::vector<char>& dat, const int& to_skip)
     }
 }
 
-void game_state::broadcast(const std::vector<char>& dat, sockaddr_storage& to_skip)
+void server_game_state::broadcast(const std::vector<char>& dat, sockaddr_storage& to_skip)
 {
     int c = 0;
 
@@ -245,7 +245,7 @@ void game_state::broadcast(const std::vector<char>& dat, sockaddr_storage& to_sk
         printf("ip conflict ");
 }
 
-void game_state::broadcast_clump(const std::vector<char>& dat, sockaddr_storage& to_skip)
+void server_game_state::broadcast_clump(const std::vector<char>& dat, sockaddr_storage& to_skip)
 {
     int c = 0;
 
@@ -268,7 +268,7 @@ void game_state::broadcast_clump(const std::vector<char>& dat, sockaddr_storage&
 }
 
 #if 0
-void game_state::tick_all()
+void server_game_state::tick_all()
 {
     for(int i=0; i<player_list.size(); i++)
     {
@@ -325,7 +325,7 @@ void game_state::tick_all()
 }
 #endif
 
-int32_t game_state::sockaddr_to_playerid(sockaddr_storage& who)
+int32_t server_game_state::sockaddr_to_playerid(sockaddr_storage& who)
 {
     for(auto& i : player_list)
     {
@@ -337,7 +337,7 @@ int32_t game_state::sockaddr_to_playerid(sockaddr_storage& who)
 }
 
 ///do kill confirmer updates here
-void game_state::tick()
+void server_game_state::tick()
 {
     const float player_kill_confirm = 0.8;
 
@@ -442,7 +442,7 @@ void game_state::tick()
     }
 }
 
-void game_state::process_received_message(byte_fetch& arg, sockaddr_storage& who)
+void server_game_state::process_received_message(byte_fetch& arg, sockaddr_storage& who)
 {
     ///copy
     byte_fetch fetch = arg;
@@ -492,7 +492,7 @@ void game_state::process_received_message(byte_fetch& arg, sockaddr_storage& who
     broadcast_clump(vec.ptr, who);
 }
 
-void game_state::process_reported_message(byte_fetch& arg, sockaddr_storage& who)
+void server_game_state::process_reported_message(byte_fetch& arg, sockaddr_storage& who)
 {
     byte_fetch fetch = arg;
 
@@ -552,7 +552,7 @@ void game_state::process_reported_message(byte_fetch& arg, sockaddr_storage& who
     arg = fetch;
 }
 
-void game_state::process_join_request(udp_sock& my_server, byte_fetch& fetch, sockaddr_storage& who)
+void server_game_state::process_join_request(udp_sock& my_server, byte_fetch& fetch, sockaddr_storage& who)
 {
     int32_t found_end = fetch.get<int32_t>();
 
@@ -577,7 +577,7 @@ void game_state::process_join_request(udp_sock& my_server, byte_fetch& fetch, so
     printf("sending ack\n");
 }
 
-void game_state::process_respawn_request(udp_sock& my_server, byte_fetch& fetch, sockaddr_storage& who)
+void server_game_state::process_respawn_request(udp_sock& my_server, byte_fetch& fetch, sockaddr_storage& who)
 {
     int32_t found_end = fetch.get<int32_t>();
 
@@ -599,7 +599,7 @@ void game_state::process_respawn_request(udp_sock& my_server, byte_fetch& fetch,
     respawn_requests.push_back(req);
 }
 
-void game_state::process_ping_response(udp_sock& my_server, byte_fetch& fetch, sockaddr_storage& who)
+void server_game_state::process_ping_response(udp_sock& my_server, byte_fetch& fetch, sockaddr_storage& who)
 {
     int32_t found_end = fetch.get<int32_t>();
 
@@ -644,7 +644,7 @@ void game_state::process_ping_response(udp_sock& my_server, byte_fetch& fetch, s
     //printf("last time %f\n", last_time_ms);
 }
 
-void game_state::process_ping_gameserver(udp_sock& sock, byte_fetch& fetch, sockaddr_storage& who)
+void server_game_state::process_ping_gameserver(udp_sock& sock, byte_fetch& fetch, sockaddr_storage& who)
 {
     int32_t found_end = fetch.get<int32_t>();
 
@@ -663,7 +663,7 @@ void game_state::process_ping_gameserver(udp_sock& sock, byte_fetch& fetch, sock
 ///ok, the server can store everyone's pings and then distribute to clients
 ///really we should be sending out timestamps with all the updates, and then use that :[
 
-void game_state::ping()
+void server_game_state::ping()
 {
     //for(auto& i : player_list)
     //    i.clk.restart();
@@ -680,7 +680,7 @@ void game_state::ping()
     broadcast(vec.ptr, none);
 }
 
-void game_state::broadcast_ping_data()
+void server_game_state::broadcast_ping_data()
 {
     static sf::Clock clk;
     const float send_time_ms = 1000;
@@ -715,7 +715,7 @@ void game_state::broadcast_ping_data()
 }
 
 ///oh dear. Ping doesn't want to be a global thing :[
-/*void game_state::process_ping_and_forward(udp_sock& my_server, byte_fetch& fetch, sockaddr_storage& who)
+/*void server_game_state::process_ping_and_forward(udp_sock& my_server, byte_fetch& fetch, sockaddr_storage& who)
 {
     int32_t found_end = fetch.get<int32_t>();
 
@@ -732,7 +732,7 @@ void game_state::broadcast_ping_data()
     broadcast(vec.ptr, none);
 }
 
-void game_state::process_ping_response_and_forward(udp_sock& my_server, byte_fetch& fetch, sockaddr_storage& who)
+void server_game_state::process_ping_response_and_forward(udp_sock& my_server, byte_fetch& fetch, sockaddr_storage& who)
 {
     int32_t found_end = fetch.get<int32_t>();
 
@@ -749,7 +749,7 @@ void game_state::process_ping_response_and_forward(udp_sock& my_server, byte_fet
     broadcast(vec.ptr, none);
 }*/
 
-void game_state::respawn_player(int32_t player_id)
+void server_game_state::respawn_player(int32_t player_id)
 {
     int team_id = get_team_from_player_id(player_id);
 
@@ -792,7 +792,7 @@ void game_state::respawn_player(int32_t player_id)
     udp_send_to(play.sock, vec.ptr, (const sockaddr*)&play.store);
 }
 
-vec2f game_state::find_respawn_position(int team_id)
+vec2f server_game_state::find_respawn_position(int team_id)
 {
     if(respawn_positions.size() <= team_id)
     {
@@ -830,7 +830,7 @@ vec2f game_state::find_respawn_position(int team_id)
     return my_spawn;
 }
 
-void balance_first_to_x(game_state& state)
+void balance_first_to_x(server_game_state& state)
 {
     if(state.number_of_team(0) == state.number_of_team(1))
         return;
@@ -879,7 +879,7 @@ void balance_first_to_x(game_state& state)
 ///well, more of an iterative balance. Should probably make it properly fully balance
 ///team data isn't reliable. Am I an idiot?
 ///this is not a good balance, we want to distribute players evenly between teams
-void balance_ffa(game_state& state)
+void balance_ffa(server_game_state& state)
 {
     int number_of_players = state.player_list.size();
 
@@ -923,7 +923,7 @@ void balance_ffa(game_state& state)
     }
 }
 
-void game_state::balance_teams()
+void server_game_state::balance_teams()
 {
     if(mode_handler.current_game_mode == game_mode::FIRST_TO_X)
         return balance_first_to_x(*this);
@@ -932,7 +932,7 @@ void game_state::balance_teams()
         return balance_ffa(*this);
 }
 
-void game_state::periodic_team_broadcast()
+void server_game_state::periodic_team_broadcast()
 {
     static sf::Clock clk;
 
@@ -962,7 +962,7 @@ void game_state::periodic_team_broadcast()
     }
 }
 
-void game_state::periodic_gamemode_stats_broadcast()
+void server_game_state::periodic_gamemode_stats_broadcast()
 {
     static sf::Clock clk;
 
@@ -987,7 +987,7 @@ void game_state::periodic_gamemode_stats_broadcast()
     broadcast(vec.ptr, -1);
 }
 
-void game_state::periodic_respawn_info_update()
+void server_game_state::periodic_respawn_info_update()
 {
     static sf::Clock clk;
 
@@ -1019,7 +1019,7 @@ void game_state::periodic_respawn_info_update()
     }
 }
 
-void game_mode_handler::tick(game_state* state)
+void game_mode_handler::tick(server_game_state* state)
 {
     current_session_state.time_elapsed += clk.getElapsedTime().asMicroseconds() / 1000.f;
     clk.restart();

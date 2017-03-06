@@ -48,7 +48,7 @@ sock_info try_tcp_connect(const std::string& address, const std::string& port)
     return inf;
 }
 
-void ping_master(game_state& my_state, int32_t port, udp_sock& to_master)
+void ping_master(server_game_state& my_state, int32_t port, udp_sock& to_master)
 {
     static sf::Clock clk;
     static bool init = false;
@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
 
     printf("Registered on port %s\n", my_server.get_host_port().c_str());
 
-    game_state my_state;
+    server_game_state my_state;
     my_state.mode_handler.current_game_mode = game_mode::FFA;
 
     my_state.set_map(0);
