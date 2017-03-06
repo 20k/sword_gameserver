@@ -47,6 +47,8 @@ struct kill_count_timer
 
 struct server_game_state;
 
+///unify with gamemode_info in game_server_session_resources
+///shared gamemode resources
 struct game_mode_handler
 {
     sf::Clock clk;
