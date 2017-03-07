@@ -1020,6 +1020,10 @@ void server_game_state::periodic_respawn_info_update()
     }
 }
 
+///we can't move this into the shared tick under a barrier
+///because we need server game state stuff
+///it seems inappropriate to force the client to know of this...
+///but it might become more desirable in the future
 void game_mode_handler::tick(server_game_state* state)
 {
     shared_game_state.tick(false);
@@ -1053,21 +1057,5 @@ void game_mode_handler::tick(server_game_state* state)
 
 bool game_mode_handler::game_over()
 {
-    /*return current_session_state.team_0_killed >= current_session_boundaries.max_kills ||
-            current_session_state.team_1_killed >= current_session_boundaries.max_kills ||
-            current_session_state.time_elapsed >= current_session_boundaries.max_time_ms;*/
-
-    /*for(int i=0; i<TEAM_NUMS; i++)
-    {
-        ///WARNING, THIS SHOULD BE TEAM KILLS
-        if(current_session_state.team_kills[i] >= current_session_boundaries.max_kills)
-            return true;
-    }
-
-    if(current_session_state.time_elapsed >= current_session_boundaries.max_time_ms)
-        return true;
-
-    return false;*/
-
     return shared_game_state.current_session_state.game_over(shared_game_state.current_session_boundaries);
 }
