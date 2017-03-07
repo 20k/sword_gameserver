@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
     printf("Registered on port %s\n", my_server.get_host_port().c_str());
 
     server_game_state my_state;
-    my_state.mode_handler.current_game_mode = game_mode::FFA;
+    my_state.mode_handler.shared_game_state.current_game_mode = game_mode::FFA;
 
     my_state.set_map(0);
 

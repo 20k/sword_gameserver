@@ -388,11 +388,12 @@ void server_game_state::tick()
                 printf("invalid team for killer\n");
             }
 
+            ///good indication that we should have a .player_is_killed
             if(team > 0)
-                mode_handler.current_session_state.team_killed[team]++;
+                mode_handler.shared_game_state.current_session_state.team_killed[team]++;
 
             if(killer_team >= 0 && killer_team < TEAM_NUMS)
-                mode_handler.current_session_state.team_kills[killer_team]++;
+                mode_handler.shared_game_state.current_session_state.team_kills[killer_team]++;
 
             it = kill_confirmer.erase(it);
 
@@ -925,10 +926,10 @@ void balance_ffa(server_game_state& state)
 
 void server_game_state::balance_teams()
 {
-    if(mode_handler.current_game_mode == game_mode::FIRST_TO_X)
+    if(mode_handler.shared_game_state.current_game_mode == game_mode::FIRST_TO_X)
         return balance_first_to_x(*this);
 
-    if(mode_handler.current_game_mode == game_mode::FFA)
+    if(mode_handler.shared_game_state.current_game_mode == game_mode::FFA)
         return balance_ffa(*this);
 }
 
@@ -977,10 +978,10 @@ void server_game_state::periodic_gamemode_stats_broadcast()
     byte_vector vec;
     vec.push_back(canary_start);
     vec.push_back(message::GAMEMODEUPDATE);
-    vec.push_back(mode_handler.current_game_mode);
+    vec.push_back(mode_handler.shared_game_state.current_game_mode);
 
-    vec.push_back(mode_handler.current_session_state);
-    vec.push_back(mode_handler.current_session_boundaries);
+    vec.push_back(mode_handler.shared_game_state.current_session_state);
+    vec.push_back(mode_handler.shared_game_state.current_session_boundaries);
 
     vec.push_back(canary_end);
 
@@ -1021,29 +1022,28 @@ void server_game_state::periodic_respawn_info_update()
 
 void game_mode_handler::tick(server_game_state* state)
 {
-    current_session_state.time_elapsed += clk.getElapsedTime().asMicroseconds() / 1000.f;
-    clk.restart();
+    shared_game_state.tick(false);
 
-    if(game_over())
+    if(shared_game_state.game_over())
     {
         ///just changed
-        if(!in_game_over_state)
+        if(!shared_game_state.in_game_over_state)
         {
-            game_over_timer.restart();
+            shared_game_state.game_over_timer.restart();
 
             printf("Round end\n");
         }
 
-        in_game_over_state = true;
+        shared_game_state.in_game_over_state = true;
     }
 
     ///we'd need to update all the client positions here
-    if(in_game_over_state && game_over_timer.getElapsedTime().asSeconds() > game_data::game_over_time)
+    if(shared_game_state.in_game_over_state && shared_game_state.game_over_timer.getElapsedTime().asSeconds() > game_data::game_over_time)
     {
         ///reset the session state
-        current_session_state = session_state();
+        shared_game_state.current_session_state = session_state();
 
-        in_game_over_state = false;
+        shared_game_state.in_game_over_state = false;
 
         state->respawn_requests.clear();
 
@@ -1069,5 +1069,5 @@ bool game_mode_handler::game_over()
 
     return false;*/
 
-    return current_session_state.game_over(current_session_boundaries);
+    return shared_game_state.current_session_state.game_over(shared_game_state.current_session_boundaries);
 }

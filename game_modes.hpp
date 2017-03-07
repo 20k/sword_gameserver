@@ -5,6 +5,8 @@
 #include <string>
 #include <vec/vec.hpp>
 
+///this file is more.. map and session data though ;_;
+///ie a clusterfuck of unrelated things
 namespace game_mode
 {
     enum game_mode : int32_t

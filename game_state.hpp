@@ -11,6 +11,7 @@
 
 #include "../reliability_shared.hpp"
 #include "../packet_clumping_shared.hpp"
+#include "../game_mode_shared.hpp"
 
 struct player
 {
@@ -51,14 +52,7 @@ struct server_game_state;
 ///shared gamemode resources
 struct game_mode_handler
 {
-    sf::Clock clk;
-
-    game_mode_t current_game_mode = game_mode::FIRST_TO_X;
-    session_state current_session_state;
-    session_boundaries current_session_boundaries;
-
-    bool in_game_over_state = false;
-    sf::Clock game_over_timer;
+    game_mode_handler_shared shared_game_state;
 
     void tick(server_game_state* state);
 
