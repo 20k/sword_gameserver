@@ -50,6 +50,8 @@ struct server_game_state;
 
 ///unify with gamemode_info in game_server_session_resources
 ///shared gamemode resources
+///server gamemode wrapper
+///rename?
 struct game_mode_handler
 {
     game_mode_handler_shared shared_game_state;
