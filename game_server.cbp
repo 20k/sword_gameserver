@@ -56,6 +56,7 @@
 			<Add option="-logg" />
 		</Linker>
 		<Unit filename="../../openclrenderer/logging.cpp" />
+		<Unit filename="../game_mode_shared.cpp" />
 		<Unit filename="../master_server/network_messages.hpp" />
 		<Unit filename="../packet_clumping_shared.hpp" />
 		<Unit filename="../reliability_shared.cpp" />
