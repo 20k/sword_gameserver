@@ -155,6 +155,7 @@ void server_game_state::cull_disconnected_players()
             printf("Player timeout\n");// %s:%s\n", get_peer_ip(player_list[i]].store))
 
             reliable.remove_player(player_list[i].id);
+            mode_handler.shared_game_state.remove_player_entry(player_list[i].id);
 
             player_list.erase(player_list.begin() + i);
             i--;
@@ -567,12 +568,16 @@ void server_game_state::process_join_request(udp_sock& my_server, byte_fetch& fe
     add_player(my_server, who);
     ///really need to pipe back player id
 
+    int32_t new_player_id = player_list.back().id;
+
+    mode_handler.shared_game_state.make_player_entry(new_player_id);
+
     ///should really dynamically organise teams
     ///so actually that's what I'll do
     byte_vector vec;
     vec.push_back(canary_start);
     vec.push_back(message::CLIENTJOINACK);
-    vec.push_back<int32_t>(player_list.back().id);
+    vec.push_back<int32_t>(new_player_id);
     vec.push_back(canary_end);
 
     udp_send_to(my_server, vec.ptr, (const sockaddr*)&who);
@@ -793,6 +798,14 @@ void server_game_state::respawn_player(int32_t player_id)
     vec.push_back(canary_end);
 
     udp_send_to(play.sock, vec.ptr, (const sockaddr*)&play.store);
+}
+
+void server_game_state::ensure_player_info_entry()
+{
+    for(player& p : player_list)
+    {
+        mode_handler.shared_game_state.make_player_entry(p.id);
+    }
 }
 
 vec2f server_game_state::find_respawn_position(int team_id)
@@ -1022,6 +1035,35 @@ void server_game_state::periodic_respawn_info_update()
     }
 }
 
+void server_game_state::periodic_player_stats_update()
+{
+    static sf::Clock clk;
+
+    ///once per second
+    float broadcast_every_ms = 1000.f;
+
+    if(clk.getElapsedTime().asMicroseconds() / 1000.f < broadcast_every_ms)
+        return;
+
+    clk.restart();
+
+    for(auto& i : mode_handler.shared_game_state.player_info)
+    {
+        int32_t network_id = i.first;
+        player_info_shared info = i.second;
+
+        byte_vector vec;
+        vec.push_back(canary_start);
+        vec.push_back<net_type::message_t>(message::PLAYER_STATS_UPDATE_INDIVIDUAL);
+        vec.push_back<net_type::player_t>(network_id);
+        vec.push_back<player_info_shared>(info);
+        vec.push_back(canary_end);
+
+        int no_player = -1;
+        broadcast(vec.ptr, no_player);
+    }
+}
+
 ///we can't move this into the shared tick under a barrier
 ///because we need server game state stuff
 ///it seems inappropriate to force the client to know of this...
@@ -1050,6 +1092,11 @@ void game_mode_handler::tick(server_game_state* state)
         shared_game_state.current_session_state = session_state();
 
         shared_game_state.in_game_over_state = false;
+
+        ///clear player state
+        shared_game_state.player_info.clear();
+        ///ensure that empty ones exist
+        state->ensure_player_info_entry();
 
         state->respawn_requests.clear();
 

@@ -271,6 +271,8 @@ int main(int argc, char* argv[])
 
         my_state.periodic_respawn_info_update();
 
+        my_state.periodic_player_stats_update();
+
         my_state.cull_disconnected_players();
 
         my_state.reliable.tick(&my_state);

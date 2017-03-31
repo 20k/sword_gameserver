@@ -161,11 +161,13 @@ struct server_game_state
     void balance_teams();
     vec2f find_respawn_position(int team_id);
     void respawn_player(int32_t player_id);
-    void respawn_all();
+    //void respawn_all();
+    void ensure_player_info_entry();
 
     void periodic_team_broadcast();
     void periodic_gamemode_stats_broadcast();
     void periodic_respawn_info_update();
+    void periodic_player_stats_update();
 
     void reset_player_disconnect_timer(sockaddr_storage& store);
 
