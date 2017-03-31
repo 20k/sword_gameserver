@@ -388,12 +388,14 @@ void server_game_state::tick()
                 printf("invalid team for killer\n");
             }
 
-            ///good indication that we should have a .player_is_killed
+            /*///good indication that we should have a .player_is_killed
             if(team > 0)
                 mode_handler.shared_game_state.current_session_state.team_killed[team]++;
 
             if(killer_team >= 0 && killer_team < TEAM_NUMS)
-                mode_handler.shared_game_state.current_session_state.team_kills[killer_team]++;
+                mode_handler.shared_game_state.current_session_state.team_kills[killer_team]++;*/
+
+            mode_handler.shared_game_state.register_kill(player_who_killed_them, who_is_reported_dead, killer_team, team);
 
             it = kill_confirmer.erase(it);
 

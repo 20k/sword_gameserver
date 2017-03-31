@@ -41,6 +41,7 @@ struct session_boundaries
     float max_time_ms = game_data::round_default * 1000.f;
 };
 
+///team session state
 struct session_state
 {
     int32_t team_killed[TEAM_NUMS] = {0}; ///how many died on this team
